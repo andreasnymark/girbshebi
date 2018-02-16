@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Girbshebi</title>
+	<style>
+		body {
+			font: 1.2em/1.5 sans-serif;
+			color: #222;
+		}
+		.js-girbshebi {
+			display: inline-block;
+			overflow: visible;
+			white-space: nowrap;
+		}
+	</style>
+</head>
+<body>
+	<div class="js-scrollToggle">
+		<div class="block">
+			<h1><a href="#" class="js-girbshebi">This is a headline you should hover</a></h1>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum delectus voluptatem ullam facere reiciendis, ducimus in laboriosam eius tempora, earum iure non <a href="" class="js-girbshebi">a long text that’s going to be shuffled</a> cumque amet impedit nulla. Sit amet, consectetur adipisicing elit. Voluptatum delectus voluptatem ullam facere reiciendis, ducimus in laboriosam eius tempora, earum iure non tenetur numquam, quibusdam asperiores cumque amet impedit nulla.</p>
+			<p>Lorem ipsum dolor sit amet, consectetur <a href="" class="js-girbshebi">with element <strong>inside</strong></a>. Voluptatum delectus voluptatem ullam facere reiciendis, <a href="" class="js-girbshebi">ducimus in laboriosam eius tempora, earum</a> iure non tenetur numquam, quibusdam asperiores cumque amet impedit nulla.</p>
+		</div>
+		
+	<script type="text/javascript" src="girbshebi.js"></script>
+	<script>
+		document.onreadystatechange = function () {
+			if ( document.readyState === 'interactive' ) {
+				merl.girbshebi.init({interval:300});
+			}
+		}
+	</script>
+</body>
+</html>
