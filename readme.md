@@ -1,11 +1,11 @@
 # merl.girbshebi
 
-Shuffle letters around in an element when hovered, at a set interval. Returns to original when blurred. 
+Shuffle letters around in an element when hovered, at a set interval. Returns to original when user stops hovering. 
 
 ## Default markup
 
 ```HTML
-<a href="example" class="js-girbshebi">Example</a>
+<a href="#" class="js-girbshebi">Example link text</a>
 ```
 
 ## Default settings
@@ -14,6 +14,9 @@ Shuffle letters around in an element when hovered, at a set interval. Returns to
 |---|---|---|---|
 |`selector`|`string`|`.js-girshebi`||
 |`interval`|`number`|`75`|Update each millisecond.|
+|`capitilize`|`boolean`|`false`|Capitilize first letter. All others become lowercase.|
+|`width`|`boolean`|`false`|Sets initial width.|
+|`attr`|`string`|`data-girbshebi`||
 
 ##Init
 
@@ -28,4 +31,12 @@ merl.girbshebi.init( {
 	interval: 150,
 } );
 ```
+
+## Instance settings
+
+```html
+<a href="/" class="js-girbshebi" data-girbshebi='{"capitilize":true, "interval":25, "width":true}'>example</a>
+```
+
+
 

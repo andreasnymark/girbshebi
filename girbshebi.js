@@ -3,7 +3,7 @@
  *
  * @author Andreas Nymark <andreas@nymark.me>
  * @license MIT
- * @version 1
+ * @version 2
 **/
 var merl = merl || {};
 
@@ -13,8 +13,11 @@ merl.girbshebi = ( function ( window, document ) {
 
 	var instances = [],
 		defs = {
+			capitilize: false,
 			selector: '.js-girbshebi',
 			interval: 75,
+			width: false,
+			attr: 'data-girbshebi',
 		};
 
 
@@ -42,7 +45,20 @@ merl.girbshebi = ( function ( window, document ) {
 		}
 
 		for ( var i = 0; i < n; i++ ) {
-			instances[ i ] = new Girbshebi( items[ i ] );
+			var item = items[ i ],
+				data = item.getAttribute( defs.attr ),
+				json = JSON.parse( data ),
+				width = defs.width,
+				cap = defs.capitilize,
+				int = defs.interval;
+
+			if ( json ) {
+				if ( typeof json.width === 'boolean' ) width = d.width;
+				if ( typeof json.interval === 'number' ) int = d.interval;	
+				if ( typeof json.capitilize === 'boolean' ) cap = d.capitilize;
+			}
+
+			instances[ i ] = new Girbshebi( items[ i ], cap, int, width );
 		}
 	};
 
@@ -51,14 +67,17 @@ merl.girbshebi = ( function ( window, document ) {
 	 * @constructor Girbshebi
 	 * @param {HTMLElement} elem - DOM Element
 	 */
-	var Girbshebi = function ( elem ) {
+	var Girbshebi = function ( elem, capitilize, interval, width ) {
 		var t = this;
-		t.int = null;
+		t.int = [];
 		t.elem = elem;
 		t.text = t.elem.innerText;
 		t.blur = t.blur.bind( t );
 		t.hover = t.hover.bind( t );
+		t.capitilize = capitilize;
 		t.original = t.elem.innerHTML;
+		t.interval = interval;
+		t.width = width;
 		t.addEvent();
 	};
 
@@ -70,8 +89,8 @@ merl.girbshebi = ( function ( window, document ) {
 		 */
 		hover: function () {
 			var t = this;
-			t.elem.style.width = t.elem.offsetWidth + 'px';
-			t.int = setInterval( t.setText.bind( t ), defs.interval ); 
+			if ( t.width ) t.elem.style.width = t.elem.offsetWidth + 'px';
+			t.int.push( setInterval( t.setText.bind( t ), t.interval ) ); 
 			setTimeout( t.setText.bind( t ), 0 );
 		},
 
@@ -80,16 +99,26 @@ merl.girbshebi = ( function ( window, document ) {
 		 */
 		blur: function () {
 			var t = this;
-			t.elem.removeAttribute( 'style' );
+			if ( t.width ) t.elem.removeAttribute( 'style' );
 			t.elem.innerHTML = t.original;
-			clearInterval( t.int );
+			for ( var i = 0, len = t.int.length; i < len; i++ ) {
+				clearInterval( t.int[ i ] );	
+			}
+			t.int = [];
 		},
 
 		/**
 		 * @method setText
 		 */
 		setText: function () {
-			this.elem.innerHTML = this.text.shuffle();
+			var t = this;
+			if ( t.elem.parentNode.querySelector( ':hover' ) ) {
+				var txt = t.text.shuffle();
+				if ( t.capitilize ) txt = txt.capitalizeFirstLetter();	
+				t.elem.innerHTML = txt;
+			} else {
+				t.blur();
+			}
 		},
 
 		/**
@@ -130,6 +159,16 @@ merl.girbshebi = ( function ( window, document ) {
 
 		a = a.join( '' )
 		return a.replace( /\s/g, '&nbsp;' );
+	};
+
+	/**
+	 * http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
+	 * @method capitalizeFirstLetter
+	 * @return {String} string with capital first letter, and all others lowercase
+	 */
+	String.prototype.capitalizeFirstLetter = function () {
+		var txt = this.toLowerCase();
+		return txt.charAt( 0 ).toUpperCase() + txt.slice( 1 );
 	};
 
 
