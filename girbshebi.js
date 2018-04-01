@@ -3,7 +3,7 @@
  *
  * @author Andreas Nymark <andreas@nymark.me>
  * @license MIT
- * @version 2
+ * @version 3
 **/
 var merl = merl || {};
 
@@ -12,12 +12,14 @@ merl.girbshebi = ( function ( window, document ) {
 
 
 	var instances = [],
+		winWidth,
 		defs = {
 			capitilize: false,
 			selector: '.js-girbshebi',
 			interval: 75,
 			width: false,
 			attr: 'data-girbshebi',
+			minWidth: 768,
 		};
 
 
@@ -33,6 +35,8 @@ merl.girbshebi = ( function ( window, document ) {
 			}
 		}
 
+		winWidth = window.innerWidth || document.documentElement.clientWidth;
+
 		var items = document.querySelectorAll( defs.selector ),
 			n = items.length;
 
@@ -44,21 +48,23 @@ merl.girbshebi = ( function ( window, document ) {
 			instances = [];
 		}
 
-		for ( var i = 0; i < n; i++ ) {
-			var item = items[ i ],
-				data = item.getAttribute( defs.attr ),
-				json = JSON.parse( data ),
-				width = defs.width,
-				cap = defs.capitilize,
-				int = defs.interval;
+		if ( winWidth > defs.minWidth ) {
+			for ( var i = 0; i < n; i++ ) {
+				var item = items[ i ],
+					data = item.getAttribute( defs.attr ),
+					json = JSON.parse( data ),
+					width = defs.width,
+					cap = defs.capitilize,
+					int = defs.interval;
 
-			if ( json ) {
-				if ( typeof json.width === 'boolean' ) width = d.width;
-				if ( typeof json.interval === 'number' ) int = d.interval;	
-				if ( typeof json.capitilize === 'boolean' ) cap = d.capitilize;
+				if ( json ) {
+					if ( typeof json.width === 'boolean' ) width = json.width;
+					if ( typeof json.interval === 'number' ) int = json.interval;	
+					if ( typeof json.capitilize === 'boolean' ) cap = json.capitilize;
+				}
+
+				instances[ i ] = new Girbshebi( items[ i ], cap, int, width );
 			}
-
-			instances[ i ] = new Girbshebi( items[ i ], cap, int, width );
 		}
 	};
 
