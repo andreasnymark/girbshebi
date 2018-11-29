@@ -3,7 +3,7 @@
  *
  * @author Andreas Nymark <andreas@nymark.me>
  * @license MIT
- * @version 3
+ * @version 4
 **/
 var merl = merl || {};
 
@@ -77,13 +77,14 @@ merl.girbshebi = ( function ( window, document ) {
 		var t = this;
 		t.int = [];
 		t.elem = elem;
-		t.text = t.elem.innerText;
+		t.txt = t.elem.innerText;
 		t.blur = t.blur.bind( t );
 		t.hover = t.hover.bind( t );
+		t.click = t.click.bind( t );
 		t.capitilize = capitilize;
 		t.original = t.elem.innerHTML;
 		t.interval = interval;
-		t.width = width;
+		t.elemWidth = width;
 		t.addEvent();
 	};
 
@@ -95,7 +96,10 @@ merl.girbshebi = ( function ( window, document ) {
 		 */
 		hover: function () {
 			var t = this;
-			if ( t.width ) t.elem.style.width = t.elem.offsetWidth + 'px';
+			if ( t.elemWidth ) {
+				t.elem.style.width = t.elem.offsetWidth + 'px';
+				t.elem.style.overflow = 'visible';
+			}
 			t.int.push( setInterval( t.setText.bind( t ), t.interval ) ); 
 			setTimeout( t.setText.bind( t ), 0 );
 		},
@@ -105,7 +109,7 @@ merl.girbshebi = ( function ( window, document ) {
 		 */
 		blur: function () {
 			var t = this;
-			if ( t.width ) t.elem.removeAttribute( 'style' );
+			if ( t.elemWidth ) t.elem.removeAttribute( 'style' );
 			t.elem.innerHTML = t.original;
 			for ( var i = 0, len = t.int.length; i < len; i++ ) {
 				clearInterval( t.int[ i ] );	
@@ -114,12 +118,23 @@ merl.girbshebi = ( function ( window, document ) {
 		},
 
 		/**
+		 * @method click
+		 */
+		click: function ( evt ) {
+			var t = this;
+			window.location = t.elem.href;
+			evt.preventDefault();
+		},
+
+
+
+		/**
 		 * @method setText
 		 */
 		setText: function () {
 			var t = this;
 			if ( t.elem.parentNode.querySelector( ':hover' ) ) {
-				var txt = t.text.shuffle();
+				var txt = t.txt.shuffle();
 				if ( t.capitilize ) txt = txt.capitalizeFirstLetter();	
 				t.elem.innerHTML = txt;
 			} else {
@@ -134,7 +149,11 @@ merl.girbshebi = ( function ( window, document ) {
 			var t = this;
 			t.elem.addEventListener( 'mouseover', t.hover );
 			t.elem.addEventListener( 'mouseout', t.blur );
+			t.elem.addEventListener( 'mouseup', t.click );
+			
 		},
+
+
 
 		/**
 		 * @method removeEvent
@@ -163,7 +182,7 @@ merl.girbshebi = ( function ( window, document ) {
 			a[ j ] = tmp;
 		}
 
-		a = a.join( '' )
+		a = a.join( '' );
 		return a.replace( /\s/g, '&nbsp;' );
 	};
 
