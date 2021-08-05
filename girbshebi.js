@@ -6,7 +6,7 @@ var merl = merl || {};
  * @namespace girbshebi
  * @memberof merl
  * @license MIT
- * @version 5
+ * @version 6
  * @property {boolean} capitilize - Always capitilize first letter. Will most likely change width.  
  * @property {string} selector - Selector
  * @property {integer} interval - Interval for shuffling letters
@@ -104,8 +104,6 @@ merl.girbshebi = ( function ( window, document ) {
 			t.elem.addEventListener( 'mouseout', t.blur );
 		},
 
-
-
 		/**
 		 * @protected
 		 * @memberof merl.girbshebi.Girbshebi
@@ -116,7 +114,6 @@ merl.girbshebi = ( function ( window, document ) {
 			t.elem.removeEventListener( 'mouseout', t.blur );
 		},
 	};
-
 
 	/**
 	 * Shuffle letters to make new “word”. [Credit](https://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string)
@@ -149,7 +146,6 @@ merl.girbshebi = ( function ( window, document ) {
 		var txt = this.toLowerCase();
 		return txt.charAt( 0 ).toUpperCase() + txt.slice( 1 );
 	};
-	
 	
 	/**
 	 * Initiate girbshebi.
@@ -193,14 +189,13 @@ merl.girbshebi = ( function ( window, document ) {
 				}
 
 				instances[ i ] = new Girbshebi( items[ i ], cap, int, width );
+				item.setAttribute( 'aria-label', item.textContent );
 			}
 		}
 	};
 
-
 	return {
 		init: init,
 	};
-
 
 } ( window, document ) );
