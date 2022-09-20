@@ -1,42 +1,47 @@
-# merl.girbshebi
+# Girbshebi
 
-Shuffle letters around in an element when hovered, at a set interval. Returns to original when user stops hovering. 
+Shuffle letters around in an hovered element. At a set interval. Returns to original text when user stops hovering.
 
 ## Default markup
 
 ```HTML
-<a href="#" class="js-girbshebi">Example link text</a>
+<a href="#" class="giberish">Example link text</a>
 ```
 
-## Default settings
+```javascript
+import { Girbshebi } from './girbshebi.js';
+
+let nav = document.querySelectorAll( '.giberish' );
+nav.forEach( ( elem ) => {
+	new Girbshebi( elem, { interval: 10, capitilize: true } );
+})
+
+```
+
+## Settings
 
 |Key|Type|Default|Note|
 |---|---|---|---|
-|`selector`|`string`|`.js-girshebi`||
-|`interval`|`number`|`75`|Update each millisecond.|
+|`interval`|`number`|`75`|Shuffle text interval. Lower number, more frequent shuffle. |
 |`capitilize`|`boolean`|`false`|Capitilize first letter. All others become lowercase.|
-|`width`|`boolean`|`false`|Sets initial width.|
-|`attr`|`string`|`data-girbshebi`||
+|`width`|`boolean`|`true`|Sets initial width using inline style. `width:NNNpx` and `overflow:visible` |
 
-##Init
+## Init
 
 ```javascript
-merl.girbshebi.init();
+new Girbshebi( elem );
 ```
+
 ## Init with settings
 
 ```javascript
-merl.girbshebi.init( {
-	selector: 'button',
+new Girbshebi( elem, {
 	interval: 150,
+	capitilize: true,
+	width: false
 } );
 ```
 
-## Instance settings
-
-```html
-<a href="/" class="js-girbshebi" data-girbshebi='{"capitilize":true, "interval":25, "width":true}'>example</a>
-```
 
 
 

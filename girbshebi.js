@@ -1,201 +1,123 @@
-/** @namespace merl */
-var merl = merl || {};
 /**
- * Shuffles letters around in an element when hovered, making gibberish words. 
- * @author Andreas Nymark <andreas@nymark.me>
- * @namespace girbshebi
- * @memberof merl
+ * Shuffles letters around in an element when hovered, making gibberish words.
+ * @author Andreas Nymark <andreas@nymark.co>
  * @license MIT
- * @version 6
- * @property {boolean} capitilize - Always capitilize first letter. Will most likely change width.  
- * @property {string} selector - Selector
+ * @version 7
+ * @property {boolean} capitilize - Always capitilize first letter. Will most likely change width.
  * @property {integer} interval - Interval for shuffling letters
- * @property {boolean} width - Set styles for initial width
- * @property {string} attr - Attribute where default word is stored.
- * @property {integer} minWidth - Minimum screen width to where Girbshebi run. 
+ * @property {boolean} width - Measure with of element and set styles
  */
-merl.girbshebi = ( function ( window, document ) {
-	"use strict";
-
-	var instances = [],
-		winWidth,
-		defs = {
+/**
+ * @class Girbshebi
+ */
+export class Girbshebi {
+	constructor ( elem, options ) {
+		this.elem = elem;
+		this.orgTextValue = elem.textContent;
+		this.int = [];
+		this.defs = {
 			capitilize: false,
-			selector: '.js-girbshebi',
 			interval: 75,
-			width: false,
-			attr: 'data-girbshebi',
-			minWidth: 768,
+			width: true,
 		};
 
-	/**
-	 * @class Girbshebi
-	 * @memberof merl.girbshebi
-	 */
-	var Girbshebi = function ( elem, capitilize, interval, width ) {
-		var t = this;
-		t.int = [];
-		t.elem = elem;
-		t.txt = t.elem.innerText;
-		t.blur = t.blur.bind( t );
-		t.hover = t.hover.bind( t );
-		t.capitilize = capitilize;
-		t.original = t.elem.innerHTML;
-		t.interval = interval;
-		t.elemWidth = width;
-		t.addEvent();
-	};
-
-	/** @lends merl.girbshebi.Girbshebi */
-	Girbshebi.prototype = {
-		/** 
-		* Triggered via 'mouseover' event.
-		* @protected
-		* @memberof merl.girbshebi.Girbshebi
-		*/
-		hover: function () {
-			var t = this;
-			if ( t.elemWidth ) {
-				t.elem.style.width = t.elem.offsetWidth + 'px';
-				t.elem.style.overflow = 'visible';
-			}
-			t.int.push( setInterval( t.setText.bind( t ), t.interval ) ); 
-			setTimeout( t.setText.bind( t ), 0 );
-		},
-
-		/** 
-		* Triggered via 'mouseout' event.
-		* @protected
-		* @memberof merl.girbshebi.Girbshebi
-		*/
-		blur: function () {
-			var t = this;
-			if ( t.elemWidth ) t.elem.removeAttribute( 'style' );
-			t.elem.innerHTML = t.original;
-			for ( var i = 0, len = t.int.length; i < len; i++ ) {
-				clearInterval( t.int[ i ] );	
-			}
-			t.int = [];
-		},
-
-		/** 
-		* Changes text according to interval.
-		* @protected
-		* @memberof merl.girbshebi.Girbshebi
-		*/
-		setText: function () {
-			var t = this;
-			if ( t.elem.parentNode.querySelector( ':hover' ) ) {
-				var txt = t.txt.shuffle();
-				if ( t.capitilize ) txt = txt.capitalizeFirstLetter();	
-				t.elem.innerHTML = txt;
-			} else {
-				t.blur();
-			}
-		},
-
-		/**
-		 * @protected
-		 * @memberof merl.girbshebi.Girbshebi
-		 */
-		addEvent: function () {
-			var t = this;
-			t.elem.addEventListener( 'mouseover', t.hover );
-			t.elem.addEventListener( 'mouseout', t.blur );
-		},
-
-		/**
-		 * @protected
-		 * @memberof merl.girbshebi.Girbshebi
-		 */
-		removeEvent: function () {
-			var t = this;
-			t.elem.removeEventListener( 'mouseover', t.hover );
-			t.elem.removeEventListener( 'mouseout', t.blur );
-		},
-	};
-
-	/**
-	 * Shuffle letters to make new “word”. [Credit](https://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string)
-	 * @method shuffle
-	 * @memberof merl.girbshebi
-	 * @return {string} New “word” with letters shuffled.
-	 */
-	String.prototype.shuffle = function () {
-		var a = this.split( '' );
-
-		for ( var n = a.length, i = n - 1; i > 0; i-- ) {
-			var j = Math.floor( Math.random() * ( i + 1 ) ),
-				tmp = a[ i ];
-
-			a[ i ] = a[ j ];
-			a[ j ] = tmp;
-		}
-
-		a = a.join( '' );
-		return a.replace( /\s/g, '&nbsp;' );
-	};
-
-	/**
-	 * Capitalize first letter in new “word”. [Credit](http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript)
-	 * @method capitalizeFirstLetter
-	 * @memberof merl.girbshebi
-	 * @return {String} New “word” with capital first letter. All others are lowercase.
-	 */
-	String.prototype.capitalizeFirstLetter = function () {
-		var txt = this.toLowerCase();
-		return txt.charAt( 0 ).toUpperCase() + txt.slice( 1 );
-	};
-	
-	/**
-	 * Initiate girbshebi.
-	 * @method init
-	 * @inner
-	 * @memberof merl.girbshebi
-	 */
-	var init = function ( options ) {
+		// Overriding defaults
 		if ( options ) {
 			for ( var o in options ) {
-				defs[ o ] = options[ o ];
+				this.defs[ o ] = options[ o ];
 			}
 		}
 
-		winWidth = window.innerWidth || document.documentElement.clientWidth;
+		// Make sure we bind all to this
+		this.blur = this.blur.bind( this );
+		this.hover = this.hover.bind( this );
+		this.setText = this.setText.bind( this );
 
-		var items = document.querySelectorAll( defs.selector ),
-			n = items.length;
+		// Event listeners
+		this.addEvent();
+	}
 
-		if ( instances.length > 0 ) {
-			for ( var i = 0, n = instances.length; i < n; i++ ) {	
-				instances[ i ].elem.dispatchEvent( new Event( 'mouseout' ) );
-				instances[ i ].removeEvent();
-			}		
-			instances = [];
+	/**
+	 * Update text when hover.
+	 */
+	hover () {
+		if ( this.defs.width ) {
+			this.elem.style.width = this.elem.offsetWidth + 'px';
+			this.elem.style.overflow = 'visible';
 		}
+		this.int.push( setInterval( this.setText, this.defs.interval ) );
+		this.elem.setAttribute( 'aria-label', this.orgTextValue );
+		setTimeout( this.setText, 0 );
+	}
 
-		if ( winWidth > defs.minWidth ) {
-			for ( var i = 0; i < n; i++ ) {
-				var item = items[ i ],
-					data = item.getAttribute( defs.attr ),
-					json = JSON.parse( data ),
-					width = defs.width,
-					cap = defs.capitilize,
-					int = defs.interval;
-
-				if ( json ) {
-					if ( typeof json.width === 'boolean' ) width = json.width;
-					if ( typeof json.interval === 'number' ) int = json.interval;	
-					if ( typeof json.capitilize === 'boolean' ) cap = json.capitilize;
-				}
-
-				instances[ i ] = new Girbshebi( items[ i ], cap, int, width );
-				item.setAttribute( 'aria-label', item.textContent );
-			}
+	/**
+	 * Reset to original text when mouseout.
+	 */
+	blur () {
+		if ( this.defs.width ) {
+			this.elem.style.width = 'auto';
+			this.elem.style.overflow = 'auto';
 		}
-	};
+		clearInterval( this.int[ this.int.length - 1 ] );
+		this.elem.setAttribute( 'aria-label', '' );
+		this.elem.innerHTML = this.orgTextValue;
+		this.int = [];
+	}
 
-	return {
-		init: init,
-	};
+	/**
+	 * Sets new shuffled word in element
+	 */
+	setText () {
+		if ( this.elem.parentNode.querySelector( ':hover' ) ) {
+			let txt = this.orgTextValue.shuffle();
+			if ( this.defs.capitilize ) txt = txt.capitalizeFirstLetter();
+			this.elem.innerHTML = '<span style="pointer-events:none">' + txt + '</span>'; // Safari-fix
+		}
+	}
 
-} ( window, document ) );
+	/**
+	 * Add event listeners
+	 */
+	addEvent () {
+		this.elem.addEventListener( 'mouseover', this.hover );
+		this.elem.addEventListener( 'mouseout', this.blur );
+	}
+
+	/**
+	 * Remove event listeners
+	 */
+	removeEvent () {
+		this.elem.removeEventListener( 'mouseover', this.hover );
+		this.elem.removeEventListener( 'mouseout', this.blur );
+	}
+}
+
+/**
+ * Shuffle letters to make new “word”. [Credit](https://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string)
+ * @method shuffle
+ * @return {string} New “word” with letters shuffled.
+ */
+String.prototype.shuffle = function () {
+ var a = this.split( '' );
+
+ for ( var n = a.length, i = n - 1; i > 0; i-- ) {
+	 var j = Math.floor( Math.random() * ( i + 1 ) ),
+		 tmp = a[ i ];
+
+	 a[ i ] = a[ j ];
+	 a[ j ] = tmp;
+ }
+
+ a = a.join( '' );
+ return a.replace( /\s/g, '&nbsp;' );
+};
+
+/**
+ * Capitalize first letter in new “word”. [Credit](http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript)
+ * @method capitalizeFirstLetter
+ * @return {String} New “word” with capital first letter. All others are lowercase.
+ */
+String.prototype.capitalizeFirstLetter = function () {
+	var txt = this.toLowerCase();
+	return txt.charAt( 0 ).toUpperCase() + txt.slice( 1 );
+};
